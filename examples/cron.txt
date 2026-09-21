@@ -1,0 +1,12 @@
+# crontab -e
+#
+# Nightly at 02:30. cron's PATH is minimal: give the full path to ai-incidents, and make sure the
+# judge's CLI (claude, by default) is reachable too. Output goes to a log you can read later; the
+# exit code is 0 for a successful run (quiet or not), 1 for a failed one, 3 if a run was already
+# in progress.
+
+PATH=/home/you/.local/bin:/usr/local/bin:/usr/bin:/bin
+30 2 * * * ai-incidents run >> "$HOME/.local/state/ai-incidents/cron.log" 2>&1
+
+# With a notification when something is filed, and a heartbeat on every successful run:
+# 30 2 * * * ai-incidents run --notify-cmd "curl -s --data-binary @- https://ntfy.sh/your-topic" >> "$HOME/.local/state/ai-incidents/cron.log" 2>&1

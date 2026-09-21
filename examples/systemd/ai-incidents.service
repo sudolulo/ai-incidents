@@ -1,0 +1,24 @@
+# A systemd *user* service. Install with:
+#   cp ai-incidents.service ai-incidents.timer ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now ai-incidents.timer
+#   loginctl enable-linger "$USER"     # so it runs while you are logged out
+#
+# Check on it with:
+#   systemctl --user list-timers ai-incidents.timer
+#   journalctl --user -u ai-incidents.service
+
+[Unit]
+Description=ai-incidents: judge new agent sessions and update the ledger
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# pipx / uv tool installs land in ~/.local/bin, which is not on a user unit's PATH.
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/.local/bin/ai-incidents run
+# A quiet run makes no model call and finishes in seconds. A busy one waits on the judge
+# ([judge] timeout, default 900s); leave headroom over it.
+TimeoutStartSec=1200
+Nice=10

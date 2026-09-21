@@ -1,0 +1,4 @@
+include README.md LICENSE NOTICE CHANGELOG.md SECURITY.md CONTRIBUTING.md
+recursive-include tests *.py
+recursive-include examples *
+recursive-include src/ai_incidents/prompts *.md

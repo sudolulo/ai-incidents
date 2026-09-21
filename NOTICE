@@ -1,0 +1,15 @@
+ai-incidents
+Copyright (c) 2026 Holden Salomon
+
+AI disclosure
+
+This tool runs an AI model as part of its normal operation: each run sends
+pre-filtered excerpts of your agent transcripts to the model you configure
+(the Claude Code CLI by default, or a local model), and that model judges which
+moments were real incidents and drafts the ledger entries.
+
+Portions of this repository, including code, tests and documentation, were
+written with the assistance of AI (Anthropic Claude / Claude Code) under the
+maintainer's direction. The sample ledger and report in examples/ were derived
+from entries the tool itself drafted during real use, then curated and
+generalized for publication.

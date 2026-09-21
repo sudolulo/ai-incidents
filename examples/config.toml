@@ -1,0 +1,93 @@
+# ai-incidents: full configuration reference.
+#
+# Default location: ~/.config/ai-incidents/config.toml (or $AI_INCIDENTS_CONFIG, or -c PATH).
+# Every key is optional except [ledger] dir. Unknown keys are an error, so a typo cannot silently
+# switch a setting off. Paths accept ~ and $VARIABLES.
+
+# --- Where the transcripts are ---------------------------------------------------------------
+# Read-only, always. Omit every [[source]] to read both defaults below.
+# Give two sources of the same type distinct names, e.g. a second Claude Code config directory.
+
+[[source]]
+type = "claude-code"
+path = "~/.claude/projects"                      # default; honours $CLAUDE_CONFIG_DIR
+# name = "claude-code"                           # default: the type
+
+[[source]]
+type = "opencode"
+path = "~/.local/share/opencode/opencode*.db"    # default; a glob, to catch channel builds
+
+# --- The pre-filter --------------------------------------------------------------------------
+
+[scan]
+max_candidates = 50          # most candidates shown to the judge in one run; the rest wait
+max_per_session = 12         # most candidates from any one session
+first_run = "baseline"       # "baseline": record existing sessions as judged, without judging
+                             # "backfill": judge them, max_candidates at a time
+exclude = []                 # fnmatch globs on the transcript path, e.g. ["*/-home-me-scratch*"]
+extra_destructive = []       # extra regexes for commands that count as destructive
+extra_benign = []            # extra regexes for destructive-looking commands that are routine
+extra_alarm = []             # extra regexes for your own alarms, e.g. ["MyJobOverdue"]
+
+# --- The judge -------------------------------------------------------------------------------
+# One model call per run, and only when there are candidates. It gets the candidates on stdin and
+# has no tools. The candidates leave this machine for whichever model you choose here.
+
+[judge]
+backend = "claude"           # "claude" | "openai" | "command"
+model = "sonnet"
+timeout = 900                # seconds
+prompt_file = ""             # replace the built-in rubric (see src/ai_incidents/prompts/judge.md)
+
+# backend = "claude": the Claude Code CLI, run with every tool and MCP server disabled.
+binary = "claude"
+extra_args = []              # appended to the claude command line
+
+# backend = "openai": any OpenAI-compatible endpoint. This is the local-model option.
+# base_url = "http://localhost:8080/v1"        # llama.cpp server
+# base_url = "http://localhost:11434/v1"       # Ollama
+# model = "qwen3:32b"
+# api_key_env = "LOCAL_LLM_KEY"                # name of an env var; never the key itself
+# json_mode = true                             # send response_format = json_object
+# max_tokens = 16000
+
+# backend = "command": any program that reads the prompt on stdin and prints the answer.
+# command = ["ollama", "run", "qwen3:32b"]
+
+# --- The output ------------------------------------------------------------------------------
+
+[ledger]
+dir = "~/ai-incidents-ledger"    # required
+order = "severity"               # "severity": most severe first | "newest"
+title = "AI incidents"           # heading for a new incidents.md
+
+[git]
+enabled = true               # commit if ledger.dir is a git repository; ignored otherwise
+push = false
+remote = "origin"
+branch = ""                  # refuse to run on any other branch; empty = whatever is checked out
+expected_remote_url = ""     # refuse to push if the remote has been repointed
+author_name = ""             # commit identity; empty = git's own configuration
+author_email = ""
+
+[state]
+file = "~/.local/state/ai-incidents/state.json"   # default ($XDG_STATE_HOME)
+seen_list = ""               # optional plain-text export of judged Claude Code transcripts, one
+                             # `<file name>:<mtime>:<size>` per line, for a cleanup job that must
+                             # not delete what has not been judged. Read back on start.
+
+[privacy]
+redact = true                # mask secret-shaped strings before the judge and before the ledger
+extra_redact_patterns = []   # extra regexes to mask
+
+# --- Hooks -----------------------------------------------------------------------------------
+# Commands, split like a shell would but not run by one. They get the run summary on stdin and in
+# AI_INCIDENTS_* environment variables. A failing hook is logged and ignored.
+
+[hooks]
+notify_cmd = ""              # after a run that filed something; quiet runs are silent
+on_success_cmd = ""          # after every successful run (a heartbeat for a dead-man's switch)
+on_failure_cmd = ""          # after a failed run
+timeout = 60
+# notify_cmd = "curl -s -H 'Title: ai-incidents' --data-binary @- https://ntfy.sh/your-topic"
+# on_success_cmd = "curl -fsS -m 10 https://hc-ping.com/your-uuid"

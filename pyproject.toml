@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-incidents"
+version = "1.0.0"
+description = "An unattended incident recorder for AI coding agents: reads your Claude Code and opencode transcripts, has a model judge what really went wrong, and keeps a severity-ranked ledger of the lessons."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Holden Salomon", email = "holden@ssalomon.com" }]
+requires-python = ">=3.11"
+dependencies = []
+keywords = ["claude-code", "opencode", "ai-agents", "incidents", "postmortem", "llm-judge", "transcripts"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/sudolulo/ai-incidents"
+Repository = "https://github.com/sudolulo/ai-incidents"
+Issues = "https://github.com/sudolulo/ai-incidents/issues"
+Changelog = "https://github.com/sudolulo/ai-incidents/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+ai-incidents = "ai_incidents.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+ai_incidents = ["prompts/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

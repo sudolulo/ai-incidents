@@ -1,0 +1,13 @@
+[Unit]
+Description=Run ai-incidents nightly
+
+[Timer]
+# Nightly is plenty: the state file makes runs incremental, and a night with nothing to judge
+# costs no model call. Run it more often than your transcripts are cleaned up (Claude Code's
+# cleanupPeriodDays defaults to 30), or sessions can be deleted before they are judged.
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+RandomizedDelaySec=600
+
+[Install]
+WantedBy=timers.target
