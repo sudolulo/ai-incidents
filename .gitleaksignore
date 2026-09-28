@@ -1,0 +1,13 @@
+# Allowlisted Gitleaks fingerprints.
+#
+# Both entries are deliberate test fixtures for this project's own redaction
+# function, not credentials: each asserts that a secret-shaped input is masked.
+# They are history-only -- the current tests assemble those strings at runtime --
+# and a historical commit cannot be cleaned without rewriting history, which is
+# not warranted for fixture data.
+#
+# Each entry is pinned to an exact commit, file, rule and line rather than
+# ignoring the tests/ directory, so a real secret committed to the same files
+# later is still reported.
+a9e828706529bab38759f9a8bea4aafc721853aa:tests/test_redact.py:generic-api-key:30
+a9e828706529bab38759f9a8bea4aafc721853aa:tests/test_judge.py:generic-api-key:71
